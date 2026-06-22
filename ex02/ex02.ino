@@ -1,31 +1,33 @@
 // 定义LED引脚
 const int ledPin = 2;  
+const int freq = 5000;
+const int resolution = 8;
 
-// 设置PWM属性
-const int freq = 5000;          // 频率 5000Hz
-const int resolution = 8;       // 分辨率 8位 (0-255)
+// 闪烁控制变量
+unsigned long previousMillis = 0;
+const long interval = 500;  // 1Hz = 1秒周期，亮500ms，灭500ms
+bool ledState = false;
 
 void setup() {
   Serial.begin(115200);
-
-  // 【新版用法】直接将引脚、频率和分辨率绑定
-  // 它会自动返回一个关联的通道（如果需要的话）
   ledcAttach(ledPin, freq, resolution);
 }
 
 void loop() {
-  // 逐渐变亮
-  for(int dutyCycle = 0; dutyCycle <= 255; dutyCycle++){   
-    // 【新版用法】直接通过引脚号写入，不再需要指定通道
-    ledcWrite(ledPin, dutyCycle);   
-    delay(10);
+  unsigned long currentMillis = millis();
+
+  // 检查是否到达切换时间点
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;  // 保存当前时间
+
+    ledState = !ledState;  // 翻转状态
+
+    if (ledState) {
+      ledcWrite(ledPin, 255);  // 亮（最大亮度）
+    } else {
+      ledcWrite(ledPin, 0);    // 灭
+    }
   }
 
-  // 逐渐变暗
-  for(int dutyCycle = 255; dutyCycle >= 0; dutyCycle--){
-    ledcWrite(ledPin, dutyCycle);   
-    delay(10);
-  }
-  
-  Serial.println("Breathing cycle completed");
+
 }
