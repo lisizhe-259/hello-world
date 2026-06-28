@@ -8,6 +8,8 @@ const int freq = 5000;
 const int resolution = 8;
 
 WebServer server(80);
+
+// ========== 网页生成函数（放在setup上方）==========
 String makePage() {
   String html = R"rawliteral(
 <!DOCTYPE html>
@@ -49,6 +51,7 @@ String makePage() {
   return html;
 }
 
+// ========== 路由处理函数（放在setup上方）==========
 void handleRoot() {
   server.send(200, "text/html; charset=UTF-8", makePage());
 }
@@ -65,6 +68,7 @@ void handleSetPWM() {
   server.send(200, "text/plain", "OK");
 }
 
+// ========== 初始化函数（现在在所有函数下方）==========
 void setup() {
   Serial.begin(115200);
   ledcAttach(LED_PIN, freq, resolution);
